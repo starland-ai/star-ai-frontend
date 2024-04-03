@@ -1,0 +1,68 @@
+.el-slider__bar {
+    background: #9246C5 !important;
+    
+}
+.el-slider__runway {
+    background-color: #232743;
+}
+.el-slider__button{
+    width: 16px;
+    height: 16px;
+    background: #16192E;
+    border: 2px solid #9246C5;
+}
+
+.el-slider__marks-text {
+    font-size: 16px;
+    color: #fff;
+}
+.el-slider__marks-stop {
+    display: none;
+}
+
+.el-menu  {
+    min-width: 18rem;
+    background: #1E223B;
+    border: none;
+  
+}
+.el-menu-item.is-active {
+    color: #9246C5;
+}
+.el-menu-item {
+    color: #fff;
+}
+.el-sub-menu__title {
+    color: #fff;
+}
+.el-sub-menu__title:hover,.el-menu-item:hover {
+    background-color: transparent;
+}
+@font-face {
+    font-family: 'Inter var'; 
+    src: url('fonts/SpaceGrotesk-VariableFont_wght.ttf') format('truetype'); 
+  }
+
+  .scrollbar-box::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width: 4px;
+    /*高宽分别对应横竖滚动条的尺寸*/
+    height: 4px;
+    border-radius: 2px;
+  }
+  .scrollbar-box::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    width: 4px;
+    height: 80px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .scrollbar-box::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+  }
+  body::-webkit-scrollbar {
+    display: none;
+  }
+

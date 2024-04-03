@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+    <title></title>
+    <style>
+        html,
+        body,
+        div {
+            width: 100%;
+            height: 100%;
+            max-height: 700px;
+            overflow: hidden;
+            background: #000;
+            position: absolute;
+        }
+    </style>
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.js"></script>
+    <script src="./gspa.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script> -->
+
+</head>
+
+<body>
+    <div class="main">
+        <div
+            class="mainBoxes fs"
+            id="mainBoxes"
+        ></div>
+        <!-- <div class="mainClose">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                width="100%"
+                height="100%"
+                fill="none"
+            >
+                <circle
+                    cx="30"
+                    cy="30"
+                    r="30"
+                    fill="#000"
+                    opacity="0.4"
+                />
+                <path
+                    d="M15,16L45,46 M45,16L15,46"
+                    stroke="#000"
+                    stroke-width="3.5"
+                    opacity="0.5"
+                />
+                <path
+                    d="M15,15L45,45 M45,15L15,45"
+                    stroke="#fff"
+                    stroke-width="2"
+                />
+            </svg>
+
+        </div> -->
+    </div>
+
+    <script>
+        var currentImg = undefined,
+            currentImgProps = { x: 0, y: 0 },
+            isZooming = false,
+            column = -1,
+            mouse = { x: 0, y: 0 },
+            delayedPlay,
+            offsetX = window.screen.width * 80 / 2040,
+            screenWidth = window.screen.width * 2 / 12,
+            yFrom = -185 * screenWidth / 224,
+            yTo = 600 * screenWidth / 224;
+
+
+        init()
+        function init() {
+            for (var i = 0; i < 84; i++) {
+
+                if (i % 7 == 0) column++;
+
+                var b = document.createElement('div');
+                $('#mainBoxes').append(b);
+
+                gsap.set(b, {
+                    attr: { id: 'b' + i, class: 'photoBox pb-col' + column },
+                    backgroundImage: 'url(https://cdn-5nz6652u9dbw.vultrcdn.com/imgs/' + i + '.png)',
+                    // backgroundImage: 'url(https://assets.codepen.io/721952/' + i + '.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    overflow: 'hidden',
+                    x: [-offsetX, screenWidth / 2 - offsetX, screenWidth - offsetX, screenWidth * 1.5 - offsetX, screenWidth * 2 - offsetX, screenWidth * 2.5 - offsetX, screenWidth * 3 - offsetX, screenWidth * 3.5 - offsetX, screenWidth * 4 - offsetX, screenWidth * 4.5 - offsetX, screenWidth * 5 - offsetX, screenWidth * 5.5 - offsetX, screenWidth * 6 - offsetX][column],
+                    // x:[-150,100],
+                    width: screenWidth,
+                    height: screenWidth,
+                    borderRadius: 0,
+                    scale: 0.5,
+                    zIndex: 1
+                });
+
+                b.tl = gsap.timeline({ paused: true, repeat: -1 })
+                    .fromTo(b,
+                        { y: [yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom][column], rotation: -0.05 },
+                        { y: [yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo, yFrom, yTo][column], rotation: 0.05, ease: 'none', duration: [40, 30, 40, 30, 40, 30, 40, 30, 40, 30, 40, 30, 40][column] }
+                    )
+                    .progress(i % 7 / 7)
+            }
+        }
+
+
+
+        window.onload = function () {
+
+            var _tl = gsap.timeline({ onStart: playBoxes })
+                .set('.main', { perspective: 800 })
+                .set('.photoBox', { opacity: 0.75, cursor: 'pointer' })
+                .set('#mainBoxes', { left: 0, xPercent: 0 })
+                // .set('#mainBoxes', { left: '72%', xPercent: -50, width: 1200, rotationX: 14, rotationY: -15, rotationZ: 10 })
+                // .set('.mainClose', { autoAlpha: 0, width: 60, height: 60, left: -30, top: -31, pointerEvents: 'none' })
+                .fromTo('.main', { autoAlpha: 0, x: 0 }, { duration: 0.6, ease: 'power2.inOut', autoAlpha: 1 }, 0.2)
+
+
+            // console.log('666', $('.photoBox'))
+
+            $('.photoBox').on('mouseenter', function (e) {
+                // console.log($(e.currentTarget).hasClass('pb-col0'))
+                // if (currentImg) return;
+                // if (delayedPlay) delayedPlay.kill();
+                // pauseBoxes(e.currentTarget);
+                var _t = e.currentTarget;
+                gsap.to('.photoBox', { duration: 0.2, overwrite: 'auto', opacity: function (i, t) { return (t == _t) ? 1 : 0.33 } });
+                gsap.fromTo(_t, { zIndex: 100 }, { duration: 0.2, scale: 0.62, overwrite: 'auto', ease: 'power3' });
+            });
+
+            $('.photoBox').on('mouseleave', function (e) {
+                if (currentImg) return;
+                var _t = e.currentTarget;
+
+                if (gsap.getProperty(_t, 'scale') > 0.62) delayedPlay = gsap.delayedCall(0.3, playBoxes); 
+                // to avoid jump, add delay when mouseout occurs as big image scales back down (not 100% reliable because the scale value sometimes evaluates too late)
+                else playBoxes();
+
+                gsap.timeline()
+                    .set(_t, { zIndex: 1 })
+                    .to(_t, { duration: 0.3, scale: 0.5, overwrite: 'auto', ease: 'expo' }, 0)
+                    .to('.photoBox', { duration: 0.5, opacity: 0.75, ease: 'power2.inOut' }, 0);
+            });
+
+        }
+
+
+        function pauseBoxes(b) {
+            var classStr = 'pb-col0';
+            if ($(b).hasClass('pb-col1')) classStr = 'pb-col1';
+            if ($(b).hasClass('pb-col2')) classStr = 'pb-col2';
+            for (var i = 0; i < $('#mainBoxes').children().length; i++) {
+                var b = $('#mainBoxes').children()[i];
+                if ($(b).hasClass(classStr)) gsap.to(b.tl, { timeScale: 0, ease: 'sine' });
+            }
+        }
+
+        function playBoxes() {
+            // console.log(1111, $('#mainBoxes').children(), $('#mainBoxes').children().length)
+            for (var i = 0; i < $('#mainBoxes').children().length; i++) {
+                var tl = $('#mainBoxes').children()[i].tl;
+                tl.play();
+                gsap.to(tl, { duration: 0.4, timeScale: 1, ease: 'sine.in', overwrite: true });
+            }
+        }
+    </script>
+</body>
+
+</html>
